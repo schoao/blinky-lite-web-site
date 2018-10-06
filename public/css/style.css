@@ -1,0 +1,110 @@
+body {
+  background-color: #7395ae;
+  padding-left:25px;
+  padding-right:25px;
+}
+a {
+  color: #444444;
+}
+img {
+  object-fit: contain;
+}
+.col {
+  padding-bottom: 20px;
+}
+.jumbotron1 {
+  background-color:#557a95 !important;
+  color:#ffffff
+}
+.jumbotron-title1
+{
+  color:#fdc300
+}
+.jumbotron-button
+{
+  color: #557a95;
+  background-color: #fdc300;
+  font-weight: bold;
+}
+.jumbotron-link
+{
+  color:#fdc300  
+}
+.featurette-heading1
+{
+  color:#ffffff
+}
+.card1
+{
+  background-color: #557a95;
+  text-align: center;
+  padding: 10px;
+}
+.card2
+{
+  padding: 5px;
+  color: #cccccc;
+  background-color: #333344;
+  width: 100%;
+  display: inline-block;
+/*  overflow-x: scroll; */
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+.card1-body
+{
+  background-color: #bbbbbb;
+}
+.card1-button
+{
+  color: #fdc300;
+  background-color: #557a95;
+  font-weight: bold;
+}
+.card1-title
+{
+  color: #ffbb33;
+  font-weight: bold;
+}
+.card1-major-bullet
+{
+  color: #000000;
+  text-align: left;
+}
+.card1-minor-bullet
+{
+  text-align: left;
+}
+.card1-minor-minor-bullet {
+	font-size: : small;
+  font-style:italic;
+  color: #5d5d5d;
+}
+
+.card1-text
+{
+  text-align: left;
+}
+.scrolling-wrapper {
+  width: 100%;
+  display: inline-block;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+.footer {
+/*   position: fixed; */
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   color:#fdc300;
+   background-color: #7395ae;
+   text-align: center;
+}
+.img-max {
+  width: 99%;
+}
+.bot-pad
+{
+  padding-bottom: 20px;
+}

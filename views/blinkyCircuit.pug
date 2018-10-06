@@ -1,0 +1,140 @@
+extends layout
+block content
+  .jumbotron.jumbotron1
+    h1.jumbotron-title.jumbotron-title1 Constructing a Blinky-Lite Circuit
+    p This section will show the circuit diagram and parts list needed to build an example Blinky-Lite circuit.
+    h2 
+      a(NAME='contents') Table of Contents
+    p
+      ul
+        li
+          a.jumbotron-link(href='#requirements') Requirements
+        li
+          a.jumbotron-link(href='#parts') Parts List
+        li
+          a.jumbotron-link(href='#construction') Constructing the Circuit
+        li
+          a.jumbotron-link(href='#firmata') Installing Firmata on the Arduino Uno
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='requirements') Requirements
+        br 
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text For this demonstration, we want to build:
+        ul.card1-text
+          li Two channels, a red channel and a green channel.
+          li On each channel we will want to have three modes: Off, Blinking, and On.
+          li Each channel should be independently switched between the three modes remotely or locally. 
+          li In the Blink mode, the blink rate of each channel should be independently remotely controlled.
+          li The LED intensity for each channel should be independently controlled locally but reported to the remote observer.
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='parts') Parts List
+        br 
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text We will use the 
+          a(href='https://www.electrokit.com/en/', target='_blank') Elecktro:kit 
+          | catalog for links to the descriptions to the products. Obtain:
+        ul.card1-text
+          li A 
+            a(href='https://www.electrokit.com/en/product/raspberry-pi-3-1gb-model-b-3/', target='_blank') Raspberry-Pi 3B 
+            | or 
+            a(href='https://www.electrokit.com/en/product/raspberry-pi-zero-wh-board-with-header-2/', target='_blank') Raspberry-Pi Zero WH
+          li An 8GB (or greater) 
+            a(href='https://www.electrokit.com/en/product/memory-card-microsdhc-8gb/', target='_blank') microSDHC Memory card 
+            | for the Raspberry-Pi operating system
+          li A 
+            a(href='https://www.electrokit.com/en/product/power-supply-5v-2a-micro-usb-black/', target='_blank')  micro-USB 5V power supply 
+            | to power the Raspberry-Pi
+          li An 
+            a(href='https://www.electrokit.com/en/product/arduino-uno-mega328-rev-3-2/', target='_blank') Arduino Uno
+          li A 
+            a(href='https://www.electrokit.com/en/product/usb-2-0-cable-a-male-b-male-1-8m/', target='_blank') USB 2.0 A-male to B-male cable 
+            | to connect the Arduino Uno to the Raspberry-Pi
+          li A 
+            a(href='https://www.electrokit.com/en/product/solderless-breadboard-400-tie-points/', target='_blank') 82 x 55mm solderless breadboard with 400 tie points
+          li
+            a(href='https://www.electrokit.com/en/product/jumper-wires-1-pin-male-male-150mm-10-pack/', target='_blank') Breadboard jumper wires
+          li
+            a(href='https://www.electrokit.com/en/product/hook-up-wires-w-pins-for-breadboard/', target='_blank') Hook-up wires with pins for breadboard
+          li Two  
+            a(href='https://www.electrokit.com/en/product/resistor-carbon-film-0-25w-220ohm-220r/', target='_blank') 220 Ohm resistors
+          li Two 
+            a(href='https://www.electrokit.com/en/product/resistor-carbon-film-0-25w-10kohm-10k/', target='_blank') 10k Ohm resistors
+          li Two 
+            a(href='https://www.electrokit.com/en/product/trimmer-pot-pt-10-10kohm-horizontal/', target='_blank') 10k Ohm Single Turn trimmer pot
+          li Two 
+            a(href='https://www.electrokit.com/en/product/tryckknapp-pcb-12x12mm-4-pack-2/', target='_blank') PCB 12mm push buttons
+          li One 
+            a(href='https://www.electrokit.com/en/product/led-3mm-green-diffused-3500mcd/', target='_blank') Green LED
+          li One 
+            a(href='https://www.electrokit.com/en/product/led-3mm-red-diffused-3500mcd/', target='_blank') Red LED
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='construction') Constructing the Circuit 
+        br
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text Setup the microSD card and the Raspberry-Pi according to the 
+          a(href='/tutorial/setupRPi', target='_blank') previous tutorial
+          | . Build the following circuit with the above components. you can find the 
+          a(href='http://fritzing.org/home/', target='_blank') Fritzing 
+          | file 
+          a(href='https://github.com/Blinky-Lite/blinky-lite-tutorial/blob/drawings/device-schemtatic.fzz?raw=true', target='_blank') here
+          | .
+          br
+          a(href='/img/tutorial/blinkyCircuitSchematic.png', target='_blank') 
+            img(src='/img/tutorial/blinkyCircuitSchematic.png', width='100%')
+          br
+          a(href='/img/tutorial/blinkyCircuitLayout.png', target='_blank') 
+            img(src='/img/tutorial/blinkyCircuitLayout.png', width='100%')
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='firmata') Installing Firmata on the Arduino Uno 
+        br
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text In the 
+          a(href='/tutorial/setupRPi#arduino', target='_blank') previous tutorial
+          | , you learned how install the programming Integrated Development Environment (IDE) for the Arduino
+          | and tested making one of the on-board LEDs blink. The Arduino IDE is a very elegant and powerful 
+          | programming environment that is based on the C++ language. The C++ language can be a bit daunting 
+          | for beginners and is overkill for many applications. Instead of beginning with using the Arduino IDE, 
+          | we will in this tutorial install a software package called 
+          a(href='https://github.com/firmata/arduino', target='_blank') Firmata
+          | . This software package will allow us to communicate directly to the Arduino from Node-Red running 
+          | on the device message adapter through the serial port. Of course the trade-off will be speed and the 
+          | ability to use interrupts but this should not bother us for most applications and we revisit these 
+          | features in future tutorials. 
+          br
+          | To install Firmata on the Arduino Uno, connect the serial port of the Arduino Uno to one of the serial 
+          | ports of Raspberry Pi that you set up in the previous section. Open the Arduino IDE on the Raspberry Pi. 
+          | Make sure you select the correct board (Arduino Uno) under Tools->Board->Arduino/Genuino Uno menu item 
+          | and the correct port under Tools->Port->/dev/ttyACM0. Load the Firmata sketch into the Arduino IDE by 
+          | selecting File->Examples->Firmata->StandardFirmata
+          | Upload the sketch to the Arduino Uno using  upload button on the IDE.
+        p 
+          b That’s it! We are ready to start building the device message adapter!
+        .row
+          .col-md-6
+            a(href='/img/tutorial/Firmata1.png', target='_blank') 
+              img(src='/img/tutorial/Firmata1.png', width='100%')
+          .col-md-6
+            a(href='/img/tutorial/Firmata2.png', target='_blank') 
+              img(src='/img/tutorial/Firmata2.png', width='100%')
+
+    
+  
+  
+  
+  

@@ -1,0 +1,451 @@
+extends layout
+block content
+  .jumbotron.jumbotron1
+    h1.jumbotron-title.jumbotron-title1 Setting Up a Raspberry-Pi for Blinky-Lite
+    p The Raspberry Pi computer integral component of the Blinky-Lite. 
+      | It can be used a device message controller, an MQTT broker, and a Node-RED web application 
+      | This section will show you how to setup a Raspberry Pi so it can function seamlessly in Blinky-Lite.
+    h2 
+      a(NAME='contents') Table of Contents
+    p
+      ul
+        li
+          a.jumbotron-link(href='#diskImage') Setting up the Disk Image
+        li
+          a.jumbotron-link(href='#connecting') Connecting to the Raspberry-Pi
+        li
+          a.jumbotron-link(href='#node') Setting up node.js and npm
+        li 
+          a.jumbotron-link(href='#arduino') Installing a Arduino Programing Environment
+        li 
+          a.jumbotron-link(href='#mqtt') Installing an MQTT Broker
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='diskImage') Setting up the Disk Image 
+        br
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text On Linux desktop computer, download the latest Raspberry Pi image at: 
+          a(href='https://downloads.raspberrypi.org/raspbian_latest', target='_blank') https://downloads.raspberrypi.org/raspbian_latest
+          br
+          | The downloaded file will have a name like 
+          b YYYY-MM-DD-raspbian-stretch.zip
+          br 
+          | Where YYYY-MM-DD is the year, month, and date of the release. Change directory to the location of the downloaded file and unzip it:
+          br 
+          code.card.card2 unzip YYYY-MM-DD-raspbian-stretch.zip
+          br
+          | Before you insert an SD card into your computer identify the names of the drives on your computer by typing:
+          br
+          code.card.card2 df -h
+          br
+          | You will see something similar to the screenshot below:
+          br
+          img.img-max(src='/img/tutorial/screenBeforeSD.png', width='95%')
+          br
+          | Now, insert an 8GB (or greater) SD card into your computer. Type:
+          br
+          code.card.card2  df -h
+          br
+          | to determine the name of the SD card
+          br
+          img.img-max(src='/img/tutorial/screenAfterSD.png', width='95%')
+          br
+          | In this example the name of the SD card is mmcblk0  (p1 is the partition).
+          | Copy the disk image 
+          b 2018-04-18-raspbian-stretch.img 
+          | to the SD card
+          br
+          code.card.card2 sudo dd if=
+            b
+              i YYYY-MM-DD
+            | -raspbian-stretch.img of=/dev/
+            b
+              i SD-CARD-NAME 
+            |  bs=1M
+          br
+          | Where in this example 
+          b 
+            i SD-CARD-NAME 
+          | is mmcblk0. Once the disk copy is complete, eject the disk and re-insert the disk. 
+          | You should see two partitions show up on your linux desktop. 
+          | The RaspberryPi image now comes with SSH disabled. 
+          | To enable it, open the boot partition of the sd card and create a file named ssh. 
+          | From a linux terminal on your desktop computer enter:
+          br
+          code.card.card2 sudo nano /media/$USER/boot/ssh
+          br
+          | Type a couple of characters and save 
+          i (cntrl-x). 
+          | For the 
+          b Raspberry Pi Zero
+          | , there is no ethernet connection so you need to give 
+          | it the information to connect to your wireless network. Edit the 
+          b wpa_supplicant.conf
+          |  file  
+          | on the rootfs partition of the sd card. From a linux terminal on your desktop computer enter:
+          br
+          code.card.card2 sudo nano /media/$USER/rootfs/etc/wpa_supplicant/wpa_supplicant.conf
+          br
+          | Add the following lines to the file where 
+          b
+            i country-abbrev
+          |  is your contry abbreviation (for example in Sweden it is SE), 
+          b
+            i your-wireless-ssid
+          |  is your wireless ssid and 
+          b
+            i your-wireless-ssid-password
+          |  is your wireless ssid password
+          br
+          code.card.card2 
+            | country=
+            b
+              i country-abbrev
+            br
+            br
+            | network={
+            br
+            | &nbsp;&nbsp;&nbsp;&nbsp;ssid="
+            b
+              i your-wireless-ssid
+            | "
+            br 
+            | &nbsp;&nbsp;&nbsp;&nbsp;psk="
+            b
+              i your-wireless-ssid-password
+            | "
+            br
+            | &nbsp;&nbsp;&nbsp;&nbsp;key_mgmt=WPA-PSK
+            br
+            | }
+          br
+          | and save 
+          i (cntrl-x).
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='connecting') Connecting to the Raspberry-Pi 
+        br
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text
+          | Eject the sd card and place it into the Raspberry-Pi. 
+          | Connect the Raspberry Pi with an ethernet cable to your router and then power up the raspberry pi. 
+          | Open a linux terminal and ssh into the RaspberryPi:
+          br
+          code.card.card2 ssh pi@raspberrypi.local
+          br
+          | The default password for the Raspberry-Pi is 
+          b
+            i raspberry  
+          | . We will want to change this immediately. 
+          | Now configure the Raspberry-Pi by running the configuration program:
+          br
+          code.card.card2 sudo raspi-config
+          br
+          | The 
+          b raspi-config 
+          | program looks as below:
+          br
+          img.img-max(src='/img/tutorial/raspi_config.png', width='95%')
+          br
+        ul.card1-text
+          li First change the password - Menu Iterm 1
+          li Under Menu Item 2, change the hostname. Do not set up the wifi, we will do that later
+          li Under Item 5, Enable both SSH (P2) and VNC (P3). We will need VNC later
+          li Under Item 7, set the screen resolution (for the VNC server)  - Choice A5. I prefer
+            b
+              i  DMT Mode 35 1280x1024 60Hz 5:4
+          li Under Item 7, Expand the file system - Choice A1
+          li Under Item 5, Serial Port (P6) select 
+            b No 
+            | for 
+            i Would you like a login shell to be accessible over serial?
+            |  Select 
+            b Yes 
+            | for 
+            i Would you like the serial port hardware to be enabled?
+        p.card1-text
+          | You should get an screen lookin as the following:
+          br
+          img.img-max(src='/img/tutorial/raspi-config-serial.png', width='95%')
+          br
+          | Using the arrow keys navigate to 
+          b Finish 
+          | to exit the configuration program and reboot the RaspberryPi
+        p.card1-text On your linux Desktop, download the RealVNC Viewer at 
+          a(href='https://www.realvnc.com/en/connect/download/viewer/linux/', target='_blank') https://www.realvnc.com/en/connect/download/viewer/linux/
+          br
+          | We will now connect to the RaspberryPi desktop. 
+          | It is easy to finish the rest of the configuration from the RaspberryPi Desktop 
+          | and the VNC Viewer will allow you to run programs such as the Arduino 
+          | programing environment on the RaspberryPi.
+        ul.card1-text
+          li Open the VNC viewer and make a New Connection under the File menu. Change the VNC server to: 
+            b
+              i hostname.local:5900 
+            | where hostname is what you entered in Item 2 of the raspi-config program. 
+          li Close the new connection dialog and double click on your new connection in the VNC Viewer window. 
+          li The VNC viewer should connect to the RaspberryPi. At first it will warn you of an identity check. 
+            | Just click continue. 
+          li Next you will be asked for a username and password. 
+            | The username is pi. The password is the password you entered in Item 2 of the raspi-config program.
+        p.card1-text You should see a window as below:
+          img.img-max(src='/img/tutorial/raspiDesktop.png', width='95%')
+        p.card1-text
+          | The wireless connection can be setup by clicking on the Up-Down arrow icon in the upper righthand corner of the desktop. 
+          | A nice GUI version of the configuration program can be found under the Preferences sub-menu of Raspberry menu.
+          br
+          img.img-max(src='/img/tutorial/raspiDesktopConfig.png')
+        p.card1-text
+          | Open the GUI raspi-config program and under the Localisation tab, set the Locale, Timezone, and Keyboard. 
+          | The RaspberryPi will have to be booted for these changes to take effect.
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='node') Setting up node.js, npm, and screen 
+        br
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text
+          | The RaspberryPi comes with very old versions of node.js and npm installed. 
+          | In this section we will update node.js and npm. 
+          | The linux application screen  will be used starting the device message adapter on boot. 
+          | From your linux desktop, ssh into the RaspberryPi
+          br
+          code.card.card2 ssh pi@hostname.local
+          br
+          | Where 
+          b
+            i hostname 
+          | is what you entered in Item 2 of the raspi-config program. Check the version of node:
+          br
+          code.card.card2 node -v
+          br
+          | As of 2018-04-18 release, the RaspberryPi ships with node.js at v4.8.2. 
+          | To upgrade, check the hardware on your RaspberryPi.
+          br
+          code.card.card2 uname -a
+          br
+          | A 
+          b RaspberryPi 3 
+          | runs an ARM7 processor while a 
+          b RaspberryPi 
+          | Zero runs  an ARM6 processor. For easier cleanup later, on the ssh session you are 
+          | running to connect to the RaspberryPi, change the directory to the Download directory:
+          br
+          code.card.card2 cd ~/Downloads
+          br
+          | In a browser go to the nodejs download page at: 
+          a(href='https://nodejs.org/en/download/', target='_blank') https://nodejs.org/en/download/
+          | The Node.js download page will look as below:
+          br
+          img.img-max(src='/img/tutorial/nodejsDownload.png', width='95%')
+        p.card1-text
+          | Find the linux binary  distribution that matches your RaspberryPi hardware (most likely ARMv7). 
+          | Copy the link location and in the ssh terminal type:
+          br
+          code.card.card2 wget https://nodejs.org/dist/vX.YY.Z/node-vX.YY.Z-linux-armv7l.tar.xz
+          br
+          | Where 
+          b
+            i vX.YY.Z 
+          | is current release of node.js. Then, unzip the file:
+          br
+          code.card.card2 tar -xf node-
+            b
+              i vX.YY.Z
+            | -linux-armv7l.tar.xz
+          br
+          | Navigate into the unzipped directory:
+          br
+          code.card.card2  cd node-
+            b
+              i vX.YY.Z
+            | -linux-armv7l
+          br
+          | And copy the files to the 
+          b 
+            i /usr/ 
+          | directory by:
+          br
+          code.card.card2 sudo cp -R * /usr/
+          br
+          | Now check the version of node.js by:
+          br
+          code.card.card2 node -v
+          br
+          | and:
+          br
+          code.card.card2  npm -v
+          br
+          | You should see a node version that matches 
+          b
+            i vX.YY.Z 
+          | and an npm version greater than 5.5.
+          | You can now delete all the items in the RaspberryPi download directory:
+          br
+          code.card.card2 rm -rf ~/Downloads/*
+          br
+          | To install 
+          b screen 
+          | enter:
+          br
+          code.card.card2  sudo apt-get install screen
+          br
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='arduino') Installing a Arduino Programing Environment
+        br
+        span(style='font-size: small;')
+          a(href='#contents')  Table of contents
+      .card-body.card1-body
+        p.card1-text Open the VNC viewer to your Raspberry Pi and then open the web browser to the software download page: 
+          a(href='https://www.arduino.cc/en/Main/Software?', target='_blank') https://www.arduino.cc/en/Main/Software? 
+        ul.card1-text
+          li Navigate to “Download the Arduino IDE” box and click on the Linux ARM version. 
+            | You will be taken to the donate page were you can donate and download the software. 
+          li Using the Raspberry Pi File Manager, create a new folder in the home director called Apps. 
+          li Copy the Arduino download from the Download folder to the Apps folders. 
+          li Right click on the tar file and choose the ‘Extract to Here’ menu item. The Arduino app will be extracted. 
+          li After extraction, delete the tar file. 
+          li Enter the Arduino folder and double click on the install.sh file. A dialog will be opened asking how you would like to run the script. 
+          li Choose ‘Execute in Terminal’. After the script has been executed, an icon for the 
+            | Arduino programing environment will be placed on the Raspberry Pi desktop and in the Programming menu item.
+        p.card1-text To check to make sure everything is working, connect an Arduino (this tutorial will use an Arduino Uno) to the Raspberry Pi via a USB cable. 
+        ul.card1-text
+          li Open the Arduino program.  
+          li Open the Blink sketch under Files->Examples->01.Basics. 
+          li Under the Tools menu, choose the correct port and correct board. 
+          li Upload the sketch to the Arduino and see that it behaves properly.
+        p.card1-text You can learn more about programming the Arduino at: 
+          a(href='https://www.arduino.cc/en/Guide/HomePage', target='_blank') https://www.arduino.cc/en/Guide/HomePage
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='mqtt') Installing an MQTT Broker
+        br
+        span(style='font-size: small;')
+          a(href='#contents')  Table of contents
+      .card-body.card1-body
+        p.card1-text 
+          i
+            | Note: it is not necessary to setup an MQTT broker on a Blinky-Lite Device Adapter or web application server. This section is for users who want to set-up their own MQTT broker. However, it does not hurt to have an MQTT broker running on any of your Raspberry-Pi’s so I usually install one as the base configuration of all my Raspberry Pi’s. 
+        p.card1-text
+          | Their are many open source MQTT brokers 
+          a(href='https://diyprojects.io/mqtt-mosquitto-communicating-connected-objects-iot/', target='_blank') available 
+          | but Blinky-Lite will use Mosquitto supported by the 
+          a(href='http://iot.eclipse.org/', target='_blank') Eclipse Foundation. 
+          | Open a terminal session into your Raspberry-Pi either through an ssh session from your 
+          | Linux desktop RealVNC  Connection. Once you have a terminal session running on your 
+          | Raspberry-Pi, install Mosquitto by typing:
+          br
+          code.card.card2 sudo apt-get install mosquitto
+          br
+          | To run tests on your Raspberry, using  mosquitto_sub clients (to subscribe), 
+          | mosquitto_pub (to post messages) and mosquitto_passwd (to set up users and passwords) enter:
+          br
+          code.card.card2 sudo apt-get install mosquitto-clients
+          br
+          | Then edit the mosquitto configuration file
+          br
+          code.card.card2 sudo nano /etc/mosquitto/mosquitto.conf
+          br
+          | by addingto the bottom of the file:
+          br
+          code.card.card2 
+            | allow_anonymous false
+            br
+            | password_file /etc/mosquitto/pwfile
+          br
+          | and save and exit (
+          i Ctrl-x
+          | ). Now setup the password for the MQTT broker:
+          br
+          code.card.card2 sudo mosquitto_passwd -c /etc/mosquitto/pwfile 
+            i broker-name
+          br
+          | I usually choose the hostname of the Raspberry-Pi as the broker name. 
+          | The program will ask you for the a password for your broker. 
+          | After you have chosen the password, reboot your Raspberry-Pi:
+          br
+          code.card.card2 sudo reboot
+          br 
+          | The Mosquitto MQTT broker should start on boot. When the Raspberry-Pi comes back up, 
+          | login and check that the MQTT broker is running by typing at the terminal:
+          br
+          code.card.card2 ps -aux | grep mosquitto
+          br
+          | You should see an output looking something like:
+          br
+          code.card.card2 mosquit+ 302 0.3 1.0 8228 4500 ?     S  07:41 0:00 /usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
+          br
+          | But the process numbers will be different. Now test the MQTT broker by subscribing to a topic:
+          br
+          code.card.card2 mosquitto_sub -h 127.0.0.1  -t chit/chat -u 
+            i broker-name 
+            | -P 
+            i broker-password
+          br
+          | where:
+        ul.card1-text
+          li 
+            b -h 
+            | is the IP address of the broker (which is 127.0.0.1 right now since we are testing the 
+            | example locally on the broker). 
+            | Note that if your Raspberry-Pi is behind a firewall and you want to access the broker 
+            | from outside the firewall (which you usually do):
+            ul
+              li you will need to setup up port forwarding on your home router. 
+              li You will need to consult the manual for your router to do that.
+              li The Port Number for the MQTT broker is the default 1883
+          li
+            b -t 
+            |  is the topic you wish to subscribe to (chit/chat in this example)
+          li
+            b -u 
+            | is the broker name you chose for the MQTT broker previously
+          li
+            b -P 
+            | is the password of the MQTT broker
+        p.card1-text The program will now wait for messages. In another terminal window, login to the Raspberry-Pi and enter:
+          br
+          code.card.card2 mosquitto_pub -h 127.0.0.1 -t chit/chat -m "Hi There" -u 
+            i broker-name 
+            | -P 
+            i broker-password
+          br
+          | Where -m is the message you would like to send to the broker 
+          | (“Hi There” in this example). You should see in the terminal running mosquitto_sub the message echoed. 
+          | Congratulations! You now have a function MQTT broker. You can exit the mosquitto_sub program by typing 
+          i ctrl-c
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+        
+        
+
+
+        
+        
+
+        
+
+        
+     

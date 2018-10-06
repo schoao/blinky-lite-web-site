@@ -1,0 +1,28 @@
+extends layout
+block content
+  .jumbotron.jumbotron1
+    h1.display-5.jumbotron-title.jumbotron-title1 BLINKY-LITE
+    h2.display-5.jumbotron-title.jumbotron-title1 Instrumentation for humans
+    p.lead.
+      Digital control is at the heart of all modern R&amp;D activities, 
+      yet it remains opaque and excessively complex to all but the most 
+      expert developers.
+    p.lead.
+      Blinky-Lite takes it out of the hands of the experts andf gives controls back to you.
+    p.lead.
+      Blinky-Lite is an open source platform based on open source technology. It is not for sale. It is free.
+    .row
+      .col-md-3 
+        a.btn.jumbotron-button(href='/examples') Examples
+      .col-md-3
+        a.btn.jumbotron-button(href='/slideShow') Slide Show
+  div.container.marketing
+    include readMoreSlides/theProblem.pug
+    include readMoreSlides/theSolution.pug
+    include readMoreSlides/iot.pug
+    include readMoreSlides/architecture.pug
+    include readMoreSlides/componentsMQTT.pug
+    include readMoreSlides/componentsNodeRed.pug
+    include readMoreSlides/componentsRaspi.pug
+    include readMoreSlides/componentsMicro.pug
+    include readMoreSlides/theFuture.pug

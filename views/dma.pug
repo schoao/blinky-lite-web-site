@@ -1,0 +1,399 @@
+extends layout
+block content
+  .jumbotron.jumbotron1
+    h1.jumbotron-title.jumbotron-title1 Building a Device Message Adapter
+    p This section will show you how to build a Device Message Adapter (DMA) in Node-Red on a Raspberry-Pi. 
+      | The DMA is the interface between the MQTT broker and the device you want to control.
+    h2 
+      a(NAME='contents') Table of Contents
+    p
+      ul
+        li
+          a.jumbotron-link(href='#installnodered') Installing Node-Red on a Raspberry-Pi
+        li
+          a.jumbotron-link(href='#runningnodered') Running Node-Red on a Raspberry-Pi
+        li
+          a.jumbotron-link(href='#addingFlows') Adding Flows To Node-RED
+        li
+          a.jumbotron-link(href='#specifyingMqtt') Specifying the MQTT Broker
+        li
+          a.jumbotron-link(href='#investigatingNodes') Investigating Node-RED Nodes 
+        li
+          a.jumbotron-link(href='#bootstart') Starting the DMA on boot
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='installnodered') Starting Node-Red on a Raspberry-Pi
+        br 
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text The Raspberry-Pi distribution comes with Node-RED already installed. 
+          | However, we would like to be able to customize Node-RED for every application. 
+          | Thus we will run Node-RED locally out of a application directory. 
+          | Then using the Node-Package-Manager (
+          b
+            a(href='https://www.npmjs.com/', target='_blank') npm
+          | ) we can customize our application. In addition, Node-RED has a settings.js file 
+          | in which security settings are set that we would also like to customize. 
+          | At Blinky-Lite, we have come up with a 
+          a(href='https://github.com/Blinky-Lite/blinky-lite-tutorial/archive/empty-node-red.zip', target='_blank') blank template 
+          | to get us started.
+          br
+          | Log into the Raspberry-Pi that is connected to the Arduino Uno. 
+          | From the home directory of the Raspberry-Pi (/home/pi) type:
+          br
+          code.card.card2 wget https://github.com/Blinky-Lite/blinky-lite-tutorial/archive/empty-node-red.zip
+          br
+          | Unzip the file
+          br
+          code.card.card2 unzip empty-node-red.zip
+          br
+          | To cleanup, remove the zip file: 
+          br
+          code.card.card2 rm empty-node-red.zip
+          br
+          | Look for the downloaded directory by typing: 
+          br
+          code.card.card2 ls
+          br
+          | You should see a directory called 
+          b
+            i blinky-lite-tutorial-empty-node-red
+          | . Rename this to  
+          b 
+            i blinky-lite-dma 
+          br
+          code.card.card2 mv blinky-lite-tutorial-empty-node-red blinky-lite-dma
+          br
+          | Enter the directory: 
+          br
+          code.card.card2 cd blinky-lite-dma
+          br
+          | And install the node-red program by typing: 
+          br
+          code.card.card2 npm install
+          br
+          | The required node-modules will be installed. This might take awhile if you are using  a Raspberry-Pi Zero.
+          br
+          | During the process of building the DMA, Node-RED will need to store credentials such as the username 
+          | and password for the MQTT broker. By default, credentials are encrypted in storage using a generated key.  
+          | This storage is defined in the 
+          b
+            i settings.js 
+          | file found in the application directory. The 
+          a(href='https://github.com/Blinky-Lite/blinky-lite-tutorial/archive/empty-node-red.zip', target='_blank') template 
+          | you downloaded from Blinky-Lite sets the key up in a file called 
+          b
+            i .env
+          | .  Normally you want a different key for every application and you do not want to store this key publically so the 
+          b
+            i .env 
+          | file is not included with the template. To create the 
+          b
+            i .env 
+          | file, at the terminal type:
+          br
+          code.card.card2 echo 'NODEREDCONFIGSECRET=
+            b
+              i your-key
+            | ' >> .env 
+          br
+          | where 
+          b 
+            i your-key 
+          | is a key that you define with only letter, numbers, and dashes.
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='runningnodered') Running Node-Red on a Raspberry-Pi
+        br 
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text  
+          | Next, run the application by typing: 
+          br
+          code.card.card2 source runNodeRed.sh
+          br
+          | The program will begin to run and you should see the following output in the terminal: 
+          br
+          img.img-max(src='/img/tutorial/noderedstartterm.png', width='100%') 
+          br
+          | You can kill the program any time by typing 
+          b 
+            i Ctrl-c. 
+          | However, leave the program running and on another computer on your local wireless network 
+          | (i.e. your desktop computer), open a browser (Chrome or Firefox recommended - 
+          b never IE !
+          | ) type the following address: 
+          br
+          code.card.card2 http:
+            b
+              i host-name
+            | .local:1880/
+          br
+          | Where 
+          b
+            i hostname 
+          | is the host name of the Raspberry-Pi that you chose in the 
+          a(href='/tutorial/setupRPi#connecting', target='_blank') Setting Up a Raspberry-Pi for Blinky-Lite 
+          | tutorial. In my case, the hostname was 
+          b 
+            i blinky-lite-12
+          | . You will see a log-in to Node-RED:
+          br
+          img.img-max(src='/img/tutorial/noderedsplash.png', width='100%') 
+          br
+          | The username and password are setup in the settings.js file of the application directory. 
+          | We will discuss how to change them later. But the template that we provided has the username set to 
+          b
+            i admin 
+          | and the password set to 
+          b 
+            i password
+          |. Enter these values. You will see the following screen:  
+          br
+          img.img-max(src='/img/tutorial/noderedemptyflow.png', width='100%') 
+          br
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='addingFlows') Adding Flows To Node-RED
+        br 
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text  
+          | Now we will add flows to our Node-RED application. In order to avoid making the tutorial tedious, we will not describe the flows node by 
+          | node but instead import the flows and then discuss the architecture and let the user investigate the 
+          | details further. Node-RED Flows are stored in 
+          a(href='https://www.json.org/', target='_blank') JSON 
+          | strings which make it very nice for version control and sharing. 
+          br 
+          | Select the 
+          b
+            i Hello 
+          | node and delete it and then press the 
+          b
+            i Deploy 
+          | button. Copy the following flows to the clipboard by  clicking the 
+          b
+            i Copy DMA Flows To Clipboard 
+          | button below:
+        p
+          button.btn.card-button.card1-button(onclick='CopyToClipboard("dmaflows", "Flows Copied to Clipboard")') Copy DMA Flows To Clipboard
+        div#dmaflows.scrolling-wrapper [{"id":"465cfd27.107674","type":"tab","label":"Red LED DMA","disabled":false,"info":""},{"id":"1abf3c75.e6d024","type":"tab","label":"Green LED DMA","disabled":false,"info":""},{"id":"6ad7c930.1a06b8","type":"ui_base","theme":{"name":"theme-dark","lightTheme":{"default":"#0094CE","baseColor":"#0094CE","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif","edited":true,"reset":false},"darkTheme":{"default":"#097479","baseColor":"#097479","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif","edited":true,"reset":false},"customTheme":{"name":"Untitled Theme 1","default":"#4B7930","baseColor":"#4B7930","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"},"themeState":{"base-color":{"default":"#097479","value":"#097479","edited":false},"page-titlebar-backgroundColor":{"value":"#097479","edited":false},"page-backgroundColor":{"value":"#111111","edited":false},"page-sidebar-backgroundColor":{"value":"#000000","edited":false},"group-textColor":{"value":"#0eb8c0","edited":false},"group-borderColor":{"value":"#555555","edited":false},"group-backgroundColor":{"value":"#333333","edited":false},"widget-textColor":{"value":"#eeeeee","edited":false},"widget-backgroundColor":{"value":"#097479","edited":false},"widget-borderColor":{"value":"#333333","edited":false},"base-font":{"value":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"}}},"site":{"name":"Blinky-Lite-Tutorial","hideToolbar":"false","allowSwipe":"false","dateFormat":"DD/MM/YYYY","sizes":{"sx":48,"sy":48,"gx":6,"gy":6,"cx":6,"cy":6,"px":0,"py":0}}},{"id":"ddd272b6.33c42","type":"mqtt-broker","z":"","name":"MQTT-dma","broker":"yourMQTTbrokerURL","port":"1883","clientid":"blinky-lite-tutorial-dma","usetls":false,"compatmode":true,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","closeTopic":"","closePayload":"","willTopic":"","willQos":"0","willPayload":""},{"id":"a617aefc.4918d","type":"arduino-board","z":"","device":"/dev/ttyACM0"},{"id":"262b6cae.fe0b94","type":"mqtt out","z":"465cfd27.107674","name":"","topic":"","qos":"0","retain":"true","broker":"ddd272b6.33c42","x":1170,"y":200,"wires":[]},{"id":"87b969ce.fb53b8","type":"function","z":"465cfd27.107674","name":"Adapt to MQTT","func":"return {'topic':'blinky-lite-tutorial/dma/red/' + msg.topic,'payload':msg.payload};","outputs":1,"noerr":0,"x":1000,"y":200,"wires":[["262b6cae.fe0b94"]]},{"id":"6243729.bae208c","type":"mqtt in","z":"465cfd27.107674","name":"","topic":"blinky-lite-tutorial/web-app/red/#","qos":"0","broker":"ddd272b6.33c42","x":170,"y":240,"wires":[["25ee484a.aa07a8"]]},{"id":"25ee484a.aa07a8","type":"json","z":"465cfd27.107674","name":"","property":"payload","action":"","pretty":false,"x":370,"y":240,"wires":[["174ff73a.4e0499"]]},{"id":"174ff73a.4e0499","type":"function","z":"465cfd27.107674","name":"Parse MQTT","func":"msg.topic = msg.topic.substring(msg.topic.lastIndexOf('/') + 1);\nflow.set(msg.topic,msg.payload);\nreturn msg;","outputs":1,"noerr":0,"x":510,"y":240,"wires":[["ae0ea12a.6f83d"]]},{"id":"b107d91b.d14b08","type":"function","z":"465cfd27.107674","name":"Button Debouncer","func":"if (msg.payload == 0) return null;\nvar thisPress = new Date().getTime();\nvar lastPress = context.get('lastPress');\nif (lastPress == undefined) lastPress = 0;\nif ((thisPress - lastPress) < 500 ) return null;\nvar ledState  = flow.get('ledState');\nledState = ledState + 1;\nif (ledState > 2) ledState = 0;\ncontext.set('lastPress',thisPress);\nmsg.topic = 'ledState';\nmsg.payload = ledState;\nreturn msg;","outputs":1,"noerr":0,"x":490,"y":120,"wires":[["ae0ea12a.6f83d"]]},{"id":"f2184265.5872d","type":"arduino in","z":"465cfd27.107674","name":"Button","pin":"8","state":"INPUT","arduino":"a617aefc.4918d","x":90,"y":120,"wires":[["b107d91b.d14b08"]]},{"id":"d83d4f80.21f96","type":"inject","z":"465cfd27.107674","name":"","topic":"ledState","payload":"1","payloadType":"num","repeat":"","crontab":"","once":true,"onceDelay":"3","x":510,"y":80,"wires":[["ae0ea12a.6f83d"]]},{"id":"b8d60c77.daaf1","type":"arduino in","z":"465cfd27.107674","name":"Pot","pin":"0","state":"ANALOG","arduino":"a617aefc.4918d","x":90,"y":180,"wires":[["2273880a.9427a8"]]},{"id":"2273880a.9427a8","type":"function","z":"465cfd27.107674","name":"Pot Blocker","func":"var lastReading = context.get('lastReading');\nif (lastReading == undefined) lastReading = -1;\nvar deltaReading = Math.abs(msg.payload - lastReading);\nif (deltaReading < 10 ) return null;\ncontext.set('lastReading', msg.payload);\nmsg.payload = Math.round(100.0 * (5.0 / 3.3) * msg.payload / 1024.0);\nmsg.topic = 'ledIntensity';\nreturn msg;","outputs":1,"noerr":0,"x":510,"y":180,"wires":[["ae0ea12a.6f83d"]]},{"id":"d0d6c694.6f0bc8","type":"inject","z":"465cfd27.107674","name":"Blinker","topic":"blinker","payload":"","payloadType":"date","repeat":"0.001","crontab":"","once":true,"onceDelay":0.1,"x":520,"y":280,"wires":[["ae0ea12a.6f83d"]]},{"id":"ae0ea12a.6f83d","type":"function","z":"465cfd27.107674","name":"LED Controller","func":"if (msg.topic != 'blinker') flow.set(msg.topic, msg.payload);\nvar ledValue = context.get('ledValue');\nif (ledValue == undefined) ledValue = -1;\nvar ledIntensity = flow.get('ledIntensity');\nif (ledIntensity == undefined) ledIntensity = 90;\nvar ledState = flow.get('ledState');\nif (ledState == undefined) ledState = 1;\nvar ledToggle = flow.get('ledToggle');\nif (ledToggle == undefined) ledToggle = 250;\nif (msg.topic != 'blinker')\n{\n    if (ledState == 0)\n    {\n        ledValue = 0;\n    }\n    if (ledState == 2) \n    {\n        ledValue = Math.round(ledIntensity * 255.0 / 100.0);\n    }\n}\nelse\n{\n    ledValue = -1;\n    var counter = context.get('counter');\n    if (counter == undefined) counter = 0;\n    if (ledState == 1)\n    {\n        if (counter == 0)\n        {\n            ledValue = Math.round(ledIntensity * 255.0 / 100.0);\n        }\n        if (counter == ledToggle)\n        {\n            ledValue = 0;\n        }\n    }\n    counter  = counter + 1;\n    if (counter > (ledToggle * 2)) counter = 0;\n    context.set('counter',counter);\n    \n    msg = null;\n}\nvar ledMsg = {'topic':'ledValue', 'payload':ledValue};\nif (ledValue < 0) ledMsg =  null;\nreturn [ledMsg, msg];","outputs":2,"noerr":0,"x":780,"y":180,"wires":[["d9704691.6989e8"],["87b969ce.fb53b8"]]},{"id":"d9704691.6989e8","type":"arduino out","z":"465cfd27.107674","name":"Led","pin":"10","state":"PWM","arduino":"a617aefc.4918d","x":970,"y":140,"wires":[]},{"id":"811444e.8abb8b8","type":"inject","z":"465cfd27.107674","name":"","topic":"ledToggle","payload":"25","payloadType":"num","repeat":"","crontab":"","once":true,"onceDelay":"2","x":510,"y":40,"wires":[["ae0ea12a.6f83d"]]},{"id":"d07b1c63.f534e","type":"mqtt out","z":"1abf3c75.e6d024","name":"","topic":"","qos":"0","retain":"true","broker":"ddd272b6.33c42","x":1170,"y":200,"wires":[]},{"id":"670b6233.900d6c","type":"function","z":"1abf3c75.e6d024","name":"Adapt to MQTT","func":"return {'topic':'blinky-lite-tutorial/dma/green/' + msg.topic,'payload':msg.payload};","outputs":1,"noerr":0,"x":1000,"y":200,"wires":[["d07b1c63.f534e"]]},{"id":"ff285190.b2cde","type":"mqtt in","z":"1abf3c75.e6d024","name":"","topic":"blinky-lite-tutorial/web-app/green/#","qos":"0","broker":"ddd272b6.33c42","x":160,"y":240,"wires":[["3d84bab8.462356"]]},{"id":"3d84bab8.462356","type":"json","z":"1abf3c75.e6d024","name":"","property":"payload","action":"","pretty":false,"x":370,"y":240,"wires":[["15c5e855.468858"]]},{"id":"15c5e855.468858","type":"function","z":"1abf3c75.e6d024","name":"Parse MQTT","func":"msg.topic = msg.topic.substring(msg.topic.lastIndexOf('/') + 1);\nflow.set(msg.topic,msg.payload);\nreturn msg;","outputs":1,"noerr":0,"x":510,"y":240,"wires":[["79b63aa5.f08fa4"]]},{"id":"3b626ccb.497094","type":"function","z":"1abf3c75.e6d024","name":"Button Debouncer","func":"if (msg.payload == 0) return null;\nvar thisPress = new Date().getTime();\nvar lastPress = context.get('lastPress');\nif (lastPress == undefined) lastPress = 0;\nif ((thisPress - lastPress) < 500 ) return null;\nvar ledState  = flow.get('ledState');\nledState = ledState + 1;\nif (ledState > 2) ledState = 0;\ncontext.set('lastPress',thisPress);\nmsg.topic = 'ledState';\nmsg.payload = ledState;\nreturn msg;","outputs":1,"noerr":0,"x":490,"y":120,"wires":[["79b63aa5.f08fa4"]]},{"id":"4ee4c26d.196bfc","type":"arduino in","z":"1abf3c75.e6d024","name":"Button","pin":"7","state":"INPUT","arduino":"a617aefc.4918d","x":90,"y":120,"wires":[["3b626ccb.497094"]]},{"id":"2355ca22.ddf556","type":"inject","z":"1abf3c75.e6d024","name":"","topic":"ledState","payload":"1","payloadType":"num","repeat":"","crontab":"","once":true,"onceDelay":"3","x":510,"y":80,"wires":[["79b63aa5.f08fa4"]]},{"id":"3f40bc50.4be6d4","type":"arduino in","z":"1abf3c75.e6d024","name":"Pot","pin":"1","state":"ANALOG","arduino":"a617aefc.4918d","x":90,"y":180,"wires":[["32146bce.fa87e4"]]},{"id":"32146bce.fa87e4","type":"function","z":"1abf3c75.e6d024","name":"Pot Blocker","func":"var lastReading = context.get('lastReading');\nif (lastReading == undefined) lastReading = -1;\nvar deltaReading = Math.abs(msg.payload - lastReading);\nif (deltaReading < 10 ) return null;\ncontext.set('lastReading', msg.payload);\nmsg.payload = Math.round(100.0 * (5.0 / 3.3) * msg.payload / 1024.0);\nmsg.topic = 'ledIntensity';\nreturn msg;","outputs":1,"noerr":0,"x":510,"y":180,"wires":[["79b63aa5.f08fa4"]]},{"id":"a5d77a8c.697998","type":"inject","z":"1abf3c75.e6d024","name":"Blinker","topic":"blinker","payload":"","payloadType":"date","repeat":"0.001","crontab":"","once":true,"onceDelay":0.1,"x":520,"y":280,"wires":[["79b63aa5.f08fa4"]]},{"id":"79b63aa5.f08fa4","type":"function","z":"1abf3c75.e6d024","name":"LED Controller","func":"if (msg.topic != 'blinker') flow.set(msg.topic, msg.payload);\nvar ledValue = context.get('ledValue');\nif (ledValue == undefined) ledValue = -1;\nvar ledIntensity = flow.get('ledIntensity');\nif (ledIntensity == undefined) ledIntensity = 90;\nvar ledState = flow.get('ledState');\nif (ledState == undefined) ledState = 1;\nvar ledToggle = flow.get('ledToggle');\nif (ledToggle == undefined) ledToggle = 250;\nif (msg.topic != 'blinker')\n{\n    if (ledState == 0)\n    {\n        ledValue = 0;\n    }\n    if (ledState == 2) \n    {\n        ledValue = Math.round(ledIntensity * 255.0 / 100.0);\n    }\n}\nelse\n{\n    ledValue = -1;\n    var counter = context.get('counter');\n    if (counter == undefined) counter = 0;\n    if (ledState == 1)\n    {\n        if (counter == 0)\n        {\n            ledValue = Math.round(ledIntensity * 255.0 / 100.0);\n        }\n        if (counter == ledToggle)\n        {\n            ledValue = 0;\n        }\n    }\n    counter  = counter + 1;\n    if (counter > (ledToggle * 2)) counter = 0;\n    context.set('counter',counter);\n    \n    msg = null;\n}\nvar ledMsg = {'topic':'ledValue', 'payload':ledValue};\nif (ledValue < 0) ledMsg =  null;\nreturn [ledMsg, msg];","outputs":2,"noerr":0,"x":780,"y":180,"wires":[["f7acb06c.b15c2"],["670b6233.900d6c"]]},{"id":"f7acb06c.b15c2","type":"arduino out","z":"1abf3c75.e6d024","name":"Led","pin":"9","state":"PWM","arduino":"a617aefc.4918d","x":970,"y":140,"wires":[]},{"id":"60fb5c3d.a70cb4","type":"inject","z":"1abf3c75.e6d024","name":"","topic":"ledToggle","payload":"25","payloadType":"num","repeat":"","crontab":"","once":true,"onceDelay":"2","x":510,"y":40,"wires":[["79b63aa5.f08fa4"]]}]
+        p.card1-text Go to the triple bar menu on the upper right hand side of the browser. 
+          | Then, go to Import->Clipboard and paste into the grey text box. Then select import:
+          br 
+          img.img-max(src='/img/tutorial/importDmaFlows.png', width='100%') 
+          br
+          | You will now see a screen with three tabs (flows).
+          br 
+          img.img-max(src='/img/tutorial/threeTabDma.png', width='100%') 
+          br
+          | Delete the empty 
+          b
+            i Flow 1 
+          | flow by double clicking on the 
+          b
+            i Flow 1 
+          | tab and select the delete button
+          br
+          img.img-max(src='/img/tutorial/deleteFlow1.png', width='100%') 
+          br
+          | You will be left with two tabs (flows)  - Red LED DMA flow and Green LED DMA flow. 
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='specifyingMqtt') Specifying the MQTT Broker
+        br 
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text  
+          | These flows are ready to be deployed except the MQTT broker needs to be specified. 
+          | In the tutorial, 
+          a(href='/tutorial/setupRPi#mqtt', target='_blank') Setting Up a Raspberry-Pi for Blinky-Lite
+          | , you installed on MQTT broker on the same Raspberry-Pi as you are now using as the DMA. 
+          | In general, the MQTT broker would be running on a separate linux computer from the DMA. 
+          | However for simplicity in this tutorial, we will use the MQTT broker that is running on DMA.
+        ul.card1-text
+          li Double click on the mqtt node on the upper right hand side of either the Red or Green flow. 
+          li There will be a pencil icon/button next to the name of the MQTT broker (MQTT-dma). Click on that icon. 
+          li Under the Connection tab, in the Server Box, is the placeholder for the URL for the MQTT 
+            | broker currently set at  
+            b
+              i yourMQTTbrokerURL
+            | . Replace the placeholder with 
+            b
+              i hostname
+            | .local where hostname is 
+            | the hostname of your Raspberry Pi. 
+          li Under the Security Tab, Set the username and password to the values you set in the 
+            a(href='/tutorial/setupRPi#mqtt', target='_blank') Setting Up a Raspberry-Pi for Blinky-Lite 
+            | part of the tutorial. In my case the broker URL is blinky-lite-12.local, the MQTT username is blinky-lite-12. 
+          li Once you have edited the mqtt-broker node with the server URL, and the Security username and password, click Update. 
+          li Then click Done to exit out of the Edit mqtt node, 
+          li and finally click Deploy to deploy the flow. 
+        p.card1-text You should see green boxes next to the MQTT and Arduino nodes and the 
+          b Blinky-Lite circuit should be blinking!
+          br
+          img.img-max(src='/img/tutorial/dmaWorking.png', width='100%') 
+          br
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='investigatingNodes') Investigating Node-RED Nodes
+        br 
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text 
+          | The nice thing about the visual nature Node-RED is that is very easy to 
+          | understand the basic function of the application at a glance. 
+          | Each node in the flow performs a specific task and then sends a message 
+          | containing a topic and a payload to downstream nodes. 
+          | The flow takes input from the Arduino Uno (i.e. if the button is pressed 
+          | and the analog voltage from the resistor pot.) It also takes input from the 
+          | MQTT broker who is receiving messages from the web application. 
+          | The signals are conditioned, for example the button is debounced and the 
+          | analog signal is filtered, and then are passed to the LED controller 
+          | node which determines what state the LED should be in. The LED controller 
+          | node then communicates with the Arduino to tell the LED what to do and also 
+          | sends messages back to the MQTT broker that can be communicated with the 
+          | web-application.
+        p.card1-text
+          | You should examine all the nodes in the flow and understand what they 
+          | are doing. For example, open the Button node by double clicking on it. 
+          | The right side panel will display the setup for this node. This node is 
+          | connected to the Arduino Uno through  the USB  port /dev/ttyACM0 in 
+          | which the Firmata protocol communicates between the Arduino Uno and 
+          | Node-RED running on the Raspberry-Pi. The node sets up Pin 8 on the 
+          | Arduino as a digital output which will communicate to Node-RED when its 
+          | state changes (i.e, the red button is pressed).
+        p.card1-text
+          img.img-max(src='/img/tutorial/dmaFlowButtonPin.png', width='100%') 
+        p.card1-text
+          | The signal from the button flow is then passed to the Button Debouncer 
+          | Node which is a function node. Function nodes are custom made nodes 
+          | that are written by the user. The function node processes the incoming 
+          | message in Javascript and sends the processed message downstream. 
+          | For example, in the Button Debouncer node eliminates a double signal 
+          | that is often associated with mechanical switches.
+        p.card1-text
+          img.img-max(src='/img/tutorial/dmaButtonDebouncer.png', width='100%') 
+        p.card1-text
+          | Our next step is to write the web-application that interfaces with the user.
+  .container.bot-pad
+    .card.card1
+      h5.card-title.card1-title 
+        a(NAME='bootstart') Starting the DMA on boot
+        br 
+        span(style='font-size: small;')
+          a(href='#contents') Table of contents
+      .card-body.card1-body
+        p.card1-text 
+          | The Node-RED flow will only run as long as the terminal session you 
+          | started  previously is active. Now we would like to set it up so that 
+          | the Node-RED flow starts when the Raspberry-Pi is powered on (booted). 
+          | We will have to create three files In your home directory of your 
+          | Raspberry-Pi (/home/pi). Open another ssh login into your Raspberry-Pi. 
+          | In your home directory (/home/pi) create a new file called 
+          b
+            i run-dma.sh
+          br
+          code.card.card2 nano run-dma.sh
+          br
+          | Add the following lines:
+          br
+          code.card.card2 
+            | #!/bin/bash
+            br
+            | sleep 5
+            br
+            | cd /home/pi/blinky-lite-dma
+            br
+            | source runNodeRed.sh
+          br
+          | Exit the editor (
+          i Ctrl-x
+          | ). Make the file an executable by typing at the terminal:
+          br
+          code.card.card2 chmod +x run-dma.sh
+          br
+          | Now create another new file:
+          br
+          code.card.card2 nano .screenrc
+          br
+          | Add the following line:
+          br
+          code.card.card2 screen -t NODER /home/pi/run-dma.sh
+          br
+          | Exit the editor (
+          i Ctrl-x
+          | ) and create one last file:
+          br
+          code.card.card2 nano init-blinky-lite.sh
+          br
+          | and add the following lines:
+          code.card.card2 #!/bin/bash
+            br
+            | sudo -iu pi /usr/bin/screen -dm
+          br
+          | Exit the editor (
+          i Ctrl-x
+          | ). Make the file an executable by typing at the terminal:
+          br
+          code.card.card2 chmod +x init-blinky-lite.sh
+          br
+          | For the last step, edit the following file:
+          br
+          code.card.card2 sudo nano /etc/rc.local
+          br
+          | Right before the last line of the file (
+          b
+            i exit 0
+          | ), type:
+          br
+          code.card.card2 /home/pi/init-blinky-lite.sh
+          br
+          | Exit the editor (Ctrl-x) and either cycle the power on the Raspberry-Pi or type:
+          br
+          code.card.card2 sudo reboot
+          br
+          | In a few minutes the lights should start blinking on the test circuit 
+          | and you can open the Node-RED flow running on the Raspberry-Pi  by 
+          | opening up a browser and pointing the address as you did in the 
+          a(href='#runningnodered') above section.
+        p.card1-text
+          | You can also log back into the Raspberry-Pi and using screen commands 
+          | to see the console output of the Node-RED application. 
+          | To see the console output of the Node-RED application, enter:
+          br
+          code.card.card2 screen -r
+          br
+          | To detach from the screen again, type 
+          b Cntl-a 
+          | folowed by typing a 
+          b d 
+          | for "detach".
+  script.
+    function CopyToClipboard(containerid, messageText) {
+    if (document.selection) { 
+        var range = document.body.createTextRange();
+        range.moveToElementText(document.getElementById(containerid));
+        range.select().createTextRange();
+        document.execCommand("copy"); 
+
+    } else if (window.getSelection) {
+        var range = document.createRange();
+         range.selectNode(document.getElementById(containerid));
+         window.getSelection().addRange(range);
+         document.execCommand("copy");
+         alert(messageText) 
+    }}
+    
+      
+      
