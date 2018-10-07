@@ -11,9 +11,9 @@ block content
         li
           a.jumbotron-link(href='#installnodered') Installing Node-RED
         li
-          a.jumbotron-link(href='#runningnodered') Running Node-Red on a Raspberry-Pi
+          a.jumbotron-link(href='#runningnodered') Running Node-RED on a Raspberry Pi Zero
         li
-          a.jumbotron-link(href='#addingFlows') Adding Flows To Node-RED
+          a.jumbotron-link(href='#addingFlows') Adding flows to Node-RED
         li
           a.jumbotron-link(href='#specifyingMqtt') Specifying the MQTT Broker
         li
@@ -32,25 +32,25 @@ block content
       .card-body.card1-body
         p.card1-text 
           | We have already installed the device message adapter (DMA) as a 
-          | Node-RED application on the Raspberry-Pi. The DMA communicates with 
-          | the device (in this case, the Arduino Uno  controlling the LED’s) 
+          | Node-RED application on the Raspberry Pi Zero. The DMA communicates with 
+          | the device (in this case, the Arduino Uno controlling the LED’s) 
           | and the MQTT broker. In keeping with the Model-View-Controller 
           | design paradigm, the MQTT broker should have been installed on a 
-          | separate linux box (another Raspberry-Pi ?) so that a single broker 
+          | separate Linux box (another Raspberry Pi Zero ?) so that a single broker 
           | could communicate with many blinky-lite DMA’s. However for the  
           | simplicity of this tutorial, we used the MQTT broker that was 
-          | installed on the same Raspberry-Pi as the DMA. 
+          | installed on the same Raspberry Pi Zero as the DMA. 
         p.card1-text
           | Next we need to build a user interface (UI) to communicate between 
-          | the MQTT broker and the user. Again, In keeping with the 
+          | the MQTT broker and the user. Again, in keeping with the 
           | Model-View-Controller design paradigm, the UI should run on a 
-          | separate linux box from the DMA and the MQTT broker so that many 
+          | separate Linux box from the DMA and the MQTT broker so that many 
           | different UI applications could communicate with the MQTT broker. 
-          | However, again for simplicity, we build the UI on a the same Raspberry-Pi
+          | However, again for simplicity, we build the UI on a the same Raspberry Pi Zero.
         p.card1-text
           | We will start as we did with building the DMA. Log into the 
-          | Raspberry-Pi that is running the DMA and MQTT broker . 
-          | From the home directory of the pi (/home/pi) type:
+          | Raspberry Pi Zero that is running the DMA and MQTT broker . 
+          | From the home directory of the pi (/home/pi or pi@localhost) type:
           br
           code.card.card2 wget https://github.com/Blinky-Lite/blinky-lite-tutorial/archive/empty-node-red.zip
           br
@@ -79,7 +79,7 @@ block content
           br
           code.card.card2 npm install
           br
-          | The required node-modules will be installed. This might take awhile if you are using  a Raspberry-Pi Zero.
+          | The required node-modules will be installed. This might take awhile if you are using  a Raspberry Pi Zero.
         p.card1-text
           | During the process of building the DMA, Node-RED will need to store credentials such as the username 
           | and password for the MQTT broker. By default, credentials are encrypted in storage using a generated key.  
@@ -94,7 +94,10 @@ block content
           | .  Normally you want a different key for every application and you do not want to store this key publically so the 
           b
             i .env 
-          | file is not included with the template. To create the 
+          | file is not included with the template. 
+          br
+          br
+          | To create the 
           b
             i .env 
           | file, at the terminal type:
@@ -110,11 +113,13 @@ block content
           | is a key that you define with only letter, numbers, and dashes.
         p.card1-text 
           | Since, for this tutorial, we are going to run the user interface 
-          | Node-RED flow on the same Raspberry-Pi as running the DMA Node-RED 
+          | Node-RED flow on the same Raspberry Pi Zero as running the DMA Node-RED 
           | flow, we need to change the port for the user interface Node-RED 
-          | flow. The port that the Node-RED flow uses is defined in the settings.js file.Open the settings.js file
+          | flow. The port that the Node-RED flow uses is defined in the settings.js file. 
           br
-          code.card.card2 nano settings. js
+          | Open the settings.js file:
+          br
+          code.card.card2 nano settings.js
           br
           | And replace the line: 
           br
@@ -130,7 +135,7 @@ block content
   .container.bot-pad
     .card.card1
       h5.card-title.card1-title 
-        a(NAME='runningnodered') Running Node-Red on a Raspberry-Pi
+        a(NAME='runningnodered') Running Node-RED on a Raspberry Pi Zero
         br 
         span(style='font-size: small;')
           a(href='#contents') Table of contents
@@ -150,25 +155,29 @@ block content
           | Where 
           b
             i hostname 
-          | is the host name of the Raspberry-Pi that you chose in the 
-          a(href='/tutorial/setupRPi#connecting', target='_blank') Setting Up a Raspberry-Pi for Blinky-Lite 
+          | is the host name of the Raspberry Pi Zero that you chose in the 
+          a(href='/tutorial/setupRPi#connecting', target='_blank') Connecting to a Raspberry Pi Zero from a Linux computer 
           | tutorial. In my case, the hostname was 
           b 
             i blinky-lite-12
+          |.
           br
           | 
-          b Note the port is 2880
-          | . As with the DMA, Node-RED flow you will see a splash screen for 
+          b Note the port is 2880 in this case
+          | . As with the DMA Node-RED flow, you will see a splash screen for 
           | Node-RED requesting a username and password. The username and 
           | password are setup in the settings.js file of the application 
           | directory. We will discuss how to change them later. But the 
-          | template that we provided has the username set to admin and the 
-          | password set to password. Enter these values and you will be taken 
+          | template that we provided has the username set to 
+          i admin 
+          | and the password set to 
+          i password
+          |. Enter these values and you will be taken 
           | to the Node-RED application desktop.
   .container.bot-pad
     .card.card1
       h5.card-title.card1-title 
-        a(NAME='addingFlows') Adding Flows To Node-RED
+        a(NAME='addingFlows') Adding flows to Node-RED
         br 
         span(style='font-size: small;')
           a(href='#contents') Table of contents
@@ -176,31 +185,33 @@ block content
         p.card1-text  
           | Now we will add flows to our Node-RED application. In order to avoid making the tutorial tedious, we will not describe the flows node by 
           | node but instead import the flows and then discuss the architecture and let the user investigate the 
-          | details further. Node-RED Flows are stored in 
+          | details further. Node-RED flows are stored in 
           a(href='https://www.json.org/', target='_blank') JSON 
           | strings which make it very nice for version control and sharing. 
           br 
           | Select the 
           b
             i Hello 
-          | node and delete it and then press the 
+          | node (double klick on it) and delete it (select Delete) and then press the 
           b
             i Deploy 
-          | button. Copy the following flows to the clipboard by  clicking the 
+          | button. Copy the following flows to the clipboard by clicking the 
           b
             i Copy UI Flows To Clipboard 
           | button below:
         p
           button.btn.card-button.card1-button(onclick='CopyToClipboard("uiflows", "Flows Copied to Clipboard")') Copy UI Flows To Clipboard
         div#uiflows.scrolling-wrapper [{"id":"a7b9d689.b8a5e8","type":"tab","label":"Red LED Web-App","disabled":false,"info":""},{"id":"eccc3b2.58241c8","type":"tab","label":"Green LED Web-App","disabled":false,"info":""},{"id":"6ad7c930.1a06b8","type":"ui_base","theme":{"name":"theme-dark","lightTheme":{"default":"#0094CE","baseColor":"#0094CE","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif","edited":true,"reset":false},"darkTheme":{"default":"#097479","baseColor":"#097479","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif","edited":true,"reset":false},"customTheme":{"name":"Untitled Theme 1","default":"#4B7930","baseColor":"#4B7930","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"},"themeState":{"base-color":{"default":"#097479","value":"#097479","edited":false},"page-titlebar-backgroundColor":{"value":"#097479","edited":false},"page-backgroundColor":{"value":"#111111","edited":false},"page-sidebar-backgroundColor":{"value":"#000000","edited":false},"group-textColor":{"value":"#0eb8c0","edited":false},"group-borderColor":{"value":"#555555","edited":false},"group-backgroundColor":{"value":"#333333","edited":false},"widget-textColor":{"value":"#eeeeee","edited":false},"widget-backgroundColor":{"value":"#097479","edited":false},"widget-borderColor":{"value":"#333333","edited":false},"base-font":{"value":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"}}},"site":{"name":"Blinky-Lite-Tutorial","hideToolbar":"false","allowSwipe":"false","dateFormat":"DD/MM/YYYY","sizes":{"sx":48,"sy":48,"gx":6,"gy":6,"cx":6,"cy":6,"px":0,"py":0}}},{"id":"5c27d05d.e787b","type":"ui_tab","z":"","name":"Blinky-Lite-Tutorial","icon":"dashboard"},{"id":"2fcf4efd.ad6ea2","type":"ui_group","z":"","name":"Red LED","tab":"5c27d05d.e787b","order":1,"disp":true,"width":"6","collapse":false},{"id":"5b5270f0.687f8","type":"ui_group","z":"","name":"Green LED","tab":"5c27d05d.e787b","order":4,"disp":true,"width":"6","collapse":false},{"id":"b94056c.1c9bba8","type":"mqtt-broker","z":"","name":"MQTT-web-app","broker":"yourMQTTbrokerURL","port":"1883","clientid":"blinky-lite-tutorial-web-app","usetls":false,"compatmode":true,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","closeTopic":"","closePayload":"","willTopic":"","willQos":"0","willPayload":""},{"id":"b3708eee.6fca3","type":"ui_button","z":"a7b9d689.b8a5e8","name":"","group":"2fcf4efd.ad6ea2","order":2,"width":0,"height":0,"passthru":false,"label":"{{msg.topic}}","color":"","bgcolor":"{{msg.background}}","icon":"","payload":"","payloadType":"num","topic":"blinky-lite-tutorial/web-app/red/ledState","x":450,"y":280,"wires":[["dd65fd39.ef0a7"]]},{"id":"37446d4f.cf4742","type":"mqtt out","z":"a7b9d689.b8a5e8","name":"","topic":"","qos":"","retain":"","broker":"b94056c.1c9bba8","x":890,"y":280,"wires":[]},{"id":"33e280b8.9fcbc","type":"mqtt in","z":"a7b9d689.b8a5e8","name":"","topic":"blinky-lite-tutorial/dma/red/#","qos":"0","broker":"b94056c.1c9bba8","x":200,"y":100,"wires":[["39f2bd14.e70492"]]},{"id":"39f2bd14.e70492","type":"json","z":"a7b9d689.b8a5e8","name":"","property":"payload","action":"","pretty":false,"x":470,"y":100,"wires":[["974acec.bcbc33"]]},{"id":"974acec.bcbc33","type":"function","z":"a7b9d689.b8a5e8","name":"Parse MQTT","func":"msg.topic = msg.topic.substring(msg.topic.lastIndexOf('/') + 1);\nreturn msg;","outputs":1,"noerr":0,"x":650,"y":100,"wires":[["875ab289.86358","87e9fdd.a28cf"]]},{"id":"875ab289.86358","type":"function","z":"a7b9d689.b8a5e8","name":"Led State","func":"if (msg.topic != 'ledState') return null;\nif (msg.payload == 0)\n{\n    msg.topic = 'Off';\n    msg.background = '#800000';\n}\nif (msg.payload == 1)\n{\n    msg.topic = 'Blinking';\n    msg.background = '#ff6666';\n}\nif (msg.payload == 2) \n{\n    msg.topic = 'On';\n    msg.background = '#ff0000';\n}\nflow.set('ledState',msg.payload)\nreturn msg;","outputs":1,"noerr":0,"x":240,"y":280,"wires":[["b3708eee.6fca3"]]},{"id":"dd65fd39.ef0a7","type":"function","z":"a7b9d689.b8a5e8","name":"Change LedState","func":"var ledState = flow.get('ledState');\nledState = ledState + 1;\nif (ledState > 2) ledState = 0;\nmsg.topic = 'blinky-lite-tutorial/web-app/red/ledState';\nmsg.payload = ledState;\nreturn msg;","outputs":1,"noerr":0,"x":650,"y":280,"wires":[["37446d4f.cf4742"]]},{"id":"74cdbda4.17a944","type":"ui_gauge","z":"a7b9d689.b8a5e8","name":"","group":"2fcf4efd.ad6ea2","order":1,"width":0,"height":0,"gtype":"gage","title":"LED Intensity","label":"","format":"{{value}}","min":0,"max":"100","colors":["#ca3838","#ca3838","#ca3838"],"seg1":"","seg2":"","x":470,"y":360,"wires":[]},{"id":"87e9fdd.a28cf","type":"function","z":"a7b9d689.b8a5e8","name":"Led Intensity","func":"if (msg.topic != 'ledIntensity') return null;\nreturn msg;","outputs":1,"noerr":0,"x":250,"y":360,"wires":[["74cdbda4.17a944"]]},{"id":"fd8577.f6e7fa88","type":"ui_slider","z":"a7b9d689.b8a5e8","name":"Blink Rate","label":"Rate","group":"2fcf4efd.ad6ea2","order":0,"width":0,"height":0,"passthru":false,"topic":"blinky-lite-tutorial/web-app/red/ledToggle","min":"1","max":"10","step":"1","x":500,"y":460,"wires":[["cc981eed.b2fbc"]]},{"id":"2ca03bc2.f1bb94","type":"inject","z":"a7b9d689.b8a5e8","name":"LedToggle Init","topic":"","payload":"5","payloadType":"num","repeat":"","crontab":"","once":true,"onceDelay":"5","x":280,"y":460,"wires":[["fd8577.f6e7fa88"]]},{"id":"cc981eed.b2fbc","type":"function","z":"a7b9d689.b8a5e8","name":"Convert Rate To Period","func":"msg.payload = Math.round(250.0 / msg.payload);\nreturn msg;","outputs":1,"noerr":0,"x":710,"y":460,"wires":[["37446d4f.cf4742"]]},{"id":"5dba97cd.9c1608","type":"ui_button","z":"eccc3b2.58241c8","name":"","group":"5b5270f0.687f8","order":2,"width":0,"height":0,"passthru":false,"label":"{{msg.topic}}","color":"","bgcolor":"{{msg.background}}","icon":"","payload":"","payloadType":"num","topic":"blinky-lite-tutorial/web-app/green/ledState","x":430,"y":240,"wires":[["b833d608.8c0c58"]]},{"id":"7e64350b.c18f1c","type":"mqtt out","z":"eccc3b2.58241c8","name":"","topic":"","qos":"","retain":"false","broker":"b94056c.1c9bba8","x":870,"y":240,"wires":[]},{"id":"93161cde.3c978","type":"mqtt in","z":"eccc3b2.58241c8","name":"","topic":"blinky-lite-tutorial/dma/green/#","qos":"0","broker":"b94056c.1c9bba8","x":180,"y":60,"wires":[["3c969c35.e17504"]]},{"id":"3c969c35.e17504","type":"json","z":"eccc3b2.58241c8","name":"","property":"payload","action":"","pretty":false,"x":450,"y":60,"wires":[["115a1f31.3bf291"]]},{"id":"115a1f31.3bf291","type":"function","z":"eccc3b2.58241c8","name":"Parse MQTT","func":"msg.topic = msg.topic.substring(msg.topic.lastIndexOf('/') + 1);\nreturn msg;","outputs":1,"noerr":0,"x":630,"y":60,"wires":[["c58281d9.08a44","3b8f4c31.b2fe54"]]},{"id":"c58281d9.08a44","type":"function","z":"eccc3b2.58241c8","name":"Led State","func":"if (msg.topic != 'ledState') return null;\nif (msg.payload == 0)\n{\n    msg.topic = 'Off';\n    msg.background = '#008000';\n}\nif (msg.payload == 1)\n{\n    msg.topic = 'Blinking';\n    msg.background = '#66ff66';\n}\nif (msg.payload == 2) \n{\n    msg.topic = 'On';\n    msg.background = '#00ff00';\n}\nflow.set('ledState',msg.payload)\nreturn msg;","outputs":1,"noerr":0,"x":220,"y":240,"wires":[["5dba97cd.9c1608"]]},{"id":"b833d608.8c0c58","type":"function","z":"eccc3b2.58241c8","name":"Change LedState","func":"var ledState = flow.get('ledState');\nledState = ledState + 1;\nif (ledState > 2) ledState = 0;\nmsg.topic = 'blinky-lite-tutorial/web-app/green/ledState';\nmsg.payload = ledState;\nreturn msg;","outputs":1,"noerr":0,"x":630,"y":240,"wires":[["7e64350b.c18f1c"]]},{"id":"d72f1e53.a291f","type":"ui_gauge","z":"eccc3b2.58241c8","name":"","group":"5b5270f0.687f8","order":1,"width":0,"height":0,"gtype":"gage","title":"LED Intensity","label":"","format":"{{value}}","min":0,"max":"100","colors":["#70ff48","#70ff48","#70ff48"],"seg1":"","seg2":"","x":450,"y":320,"wires":[]},{"id":"3b8f4c31.b2fe54","type":"function","z":"eccc3b2.58241c8","name":"Led Intensity","func":"if (msg.topic != 'ledIntensity') return null;\nreturn msg;","outputs":1,"noerr":0,"x":230,"y":320,"wires":[["d72f1e53.a291f"]]},{"id":"9a8b8069.94305","type":"ui_slider","z":"eccc3b2.58241c8","name":"Blink Rate","label":"Rate","group":"5b5270f0.687f8","order":0,"width":0,"height":0,"passthru":false,"topic":"blinky-lite-tutorial/web-app/green/ledToggle","min":"1","max":"10","step":"1","x":480,"y":420,"wires":[["b7d32579.d8de68"]]},{"id":"1692a074.a72c7","type":"inject","z":"eccc3b2.58241c8","name":"LedToggle Init","topic":"","payload":"5","payloadType":"num","repeat":"","crontab":"","once":true,"onceDelay":"5","x":260,"y":420,"wires":[["9a8b8069.94305"]]},{"id":"b7d32579.d8de68","type":"function","z":"eccc3b2.58241c8","name":"Convert Rate To Period","func":"msg.payload = Math.round(250.0 / msg.payload);\nreturn msg;","outputs":1,"noerr":0,"x":690,"y":420,"wires":[["7e64350b.c18f1c"]]}]        
-        p.card1-text Go to the triple bar menu on the upper right hand side of the browser. 
+        p.card1-text Go to the triple bar menu on the upper right hand side of the (Node-RED) browser. 
           | Then, go to Import->Clipboard and paste into the grey text box. Then select import:
           br 
           img.img-max(src='/img/tutorial/importUiFlows.png', width='100%') 
           br
+          br
           | You will now see a screen with three tabs (flows).
           br 
           img.img-max(src='/img/tutorial/threeTabUi.png', width='100%') 
+          br
           br
           | Delete the empty 
           b
@@ -221,12 +232,14 @@ block content
         p.card1-text  
           | Just like for the DMA, these flows are ready to be deployed except the MQTT broker needs to be specified. 
           | In the tutorial, 
-          a(href='/tutorial/setupRPi#mqtt', target='_blank') Setting Up a Raspberry-Pi for Blinky-Lite
-          | , you installed on MQTT broker on the same Raspberry-Pi as you are now using as the DMA. 
-          | In general, the MQTT broker would be running on a separate linux computer from the DMA. 
+          a(href='/tutorial/setupRPi#mqtt', target='_blank') Setting Up a Raspberry Pi Zero for Blinky-Lite
+          | , you installed a MQTT broker on the same Raspberry Pi Zero as you are now using as the DMA. 
+          | In general, the MQTT broker would be running on a separate Linux computer from the DMA. 
           | However for simplicity in this tutorial, we will use the MQTT broker that is running on DMA.
         ul.card1-text
-          li Double click on the mqtt node on the upper right hand side of either the Red or Green flow. 
+          li Double click on the 
+            i mqtt 
+            | node on the upper right hand side of either the Red or Green flow. 
           li There will be a pencil icon/button next to the name of the MQTT broker (MQTT-dma). Click on that icon. 
           li Under the Connection tab, in the Server Box, is the placeholder for the URL for the MQTT 
             | broker currently set at  
@@ -238,11 +251,11 @@ block content
             | .local where hostname is 
             | the hostname of your Raspberry Pi. 
           li Under the Security Tab, Set the username and password to the values you set in the 
-            a(href='/tutorial/setupRPi#mqtt', target='_blank') Setting Up a Raspberry-Pi for Blinky-Lite 
+            a(href='/tutorial/setupRPi#mqtt', target='_blank') Setting Up a Raspberry Pi Zero for Blinky-Lite 
             | part of the tutorial. In my case the broker URL is blinky-lite-12.local, the MQTT username is blinky-lite-12. 
           li Once you have edited the mqtt-broker node with the server URL, and the Security username and password, click Update. 
           li Then click Done to exit out of the Edit mqtt node, 
-          li and finally click Deploy to deploy the flow. 
+          li And finally click Deploy to deploy the flow (in case a window related to recent flows pops-up, click Ignore & deploy). 
         p.card1-text You should see green boxes next to the MQTT flows.
           br
           img.img-max(src='/img/tutorial/uiWorking.png', width='100%') 
@@ -274,15 +287,18 @@ block content
         p.card1-text
           | For this tutorial we are only interested in three of the nodes, the 
           | 
-          b button, gauge, 
+          b button, gauge 
           | and 
           b slider 
           | nodes.  Each one of the nodes can be customized and you should 
           | investigate the properties of these nodes. As these nodes are placed 
           | into the flow, their layout properties must be specified. The layout 
-          | properties of the dashboard are viewed on Dashboard Tab which 
+          | properties of the dashboard are viewed on the Dashboard Tab which 
           | includes three sub-tabs 
-          b Layout, Theme, Site.
+          b Layout, Theme 
+          | and 
+          b Site
+          |.
           .row 
             .col
               img.img-max(src='/img/tutorial/dashboardLayoutTab.png', width='100%')
@@ -301,18 +317,51 @@ block content
           | The graphical user interface can be seen at the following location:      
           br
           code.card.card2 http://
-            b 
-              i host-name
-            |.local:2880/ui
+            b
+              i hostname
+            | .local:2880/ui
           br
           | Where as before, the 
           b
-            i host-name 
-          | is the host name of the Raspberry-Pi that you chose in the Setting up 
-          | The Raspberry Pi tutorial. In my case, the host name was blinky-lite-12. 
-          b Note the port is 2880.
+            i hostname 
+          | is the hostname of the Raspberry Pi Zero that you chose in the 
+          a(href='/tutorial/setupRPi#connecting', target='_blank') Connecting to a Raspberry Pi Zero from a Linux computer 
+          | tutorial. In my case, the hostname was 
+          b 
+            i blinky-lite-12
+          | . 
+          br  
+          b Note the port is 2880 in this case
+          |.
           br 
           img.img-max(src='/img/tutorial/guiSite.png', width='100%') 
+          br
+          br
+          | The username and password are setup in the settings.js file of the application directory. 
+          | We will discuss how to change them later. But the template that we provided has the username set to 
+          b
+            i user 
+          | and the password is set to 
+          b 
+            i password
+          |. Enter these values.
+          br
+          br
+          | If one would like to access the user interface without username and password, the 
+          i settings.js 
+          | file needs to be edited:
+          br
+          code.card.card2 nano settings.js
+          br
+          | Comment both lines starting with 
+          i httpNodeAuth  
+          | and 
+          i httpStaticAuth
+          |.  
+          br
+          | Exit the editor (Ctrl-x) and either cycle the power on the Raspberry Pi Zero or type:
+          br
+          code.card.card2 sudo reboot
   .container.bot-pad
     .card.card1
       h5.card-title.card1-title 
@@ -324,9 +373,9 @@ block content
         p.card1-text 
           | As with the DMA, the  Node-RED flow will only run as long as the terminal session you 
           | started  previously is active. Now we would like to set it up so that 
-          | the Node-RED flow starts when the Raspberry-Pi is powered on (booted). 
-          | Open another ssh login into your Raspberry-Pi. 
-          | In your home directory (/home/pi) create a new file called 
+          | the Node-RED flow starts when the Raspberry Pi Zero is powered on (booted). 
+          | Open another ssh login into your Raspberry Pi Zero. 
+          | In your home directory (/home/pi or pi@localhost) create a new file called 
           b
             i run-ui.sh
           br
@@ -359,11 +408,11 @@ block content
           br
           | Exit the editor (
           i Ctrl-x
-          | ) Now when the Raspberry-Pi is powered up, the main three components, 
-          | the DMA, the MQTT broker, and the UI of Blinky-Lite will startup up automatically. 
+          | ) Now when the Raspberry Pi Zero is powered up, the main three components, 
+          | the DMA, the MQTT broker and the UI of Blinky-Lite will startup automatically. 
         p.card1-text
-          b Please note that putting all three components on a single Raspberry-Pi 
-            | was for the expediency of this tutorial and in general, the DMA, MQTT broker, 
+          b Please note that putting all three components on a single Raspberry Pi Zero 
+            | was for the expediency of this tutorial and in general, the DMA, MQTT broker 
             | and the UI should be running on separate machines.
   .container.bot-pad
     .card.card1
